@@ -1,71 +1,127 @@
-function handleDocumentReady() {
-  function switchPages($curr_page, $next_page) {
-    // Get the next page ready
-    $next_page.css({ top: "100%", display: "block" });
+var hros = hros || {};
+hros.Slider = function() {
+  var defaultParams = {
+    classPrefix: "hros-slider",
+    activeClass: "active",
+    inactiveClass: "inactive",
+    slideSufix: "slide",
+    gotoSufix: "goto",
+    arrowLeftSufix: "arrow-left",
+    arrowRightSufix: "arrow-right"
+  };
 
-    // Animate next page into the screen
-    $next_page.animate({ top: "0px" });
-
-    // Animate current page offscreen then hide it
-    $curr_page.animate({ top: "-100%" }, function() {
-      $curr_page.css({ display: "none", top: "0px", left: "0px" });
-    });
+  function defaultEnterAnimation(element) {
+    element.style.display = "initial";
   }
 
-  $slider_containers = $(".hros-slider");
-  $slider_containers.each(function(i, container) {
-    $container = $(container);
+  function defaultExitAnimation(element) {
+    element.style.display = "none";
+  }
 
-    $pages = $container.find(".hros-slider-page");
+  Slider.prototype.setActiveSlideIndex = function(index) {
+    if (this.activeSlideIndex === index) return;
 
-    if ($pages.length < 1) return;
+    this.activeSlideIndex = index;
 
-    // Find active page
-    const active_page_num =
-      (function($pages) {
-        for (let i = 0; i < $pages.length; i++) {
-          if ($pages.eq(i).hasClass("hros-slider-active-page")) {
-            return i;
-          }
-        }
-      })($pages) || 0;
+    this.updateUI();
+  };
 
-    $container.data({
-      "num-pages": $pages.length,
-      "active-page": active_page_num // Set to last element as we instantly call intervalHandler and change to 1st
-    });
+  Slider.prototype.updateUI = function() {
+    for (var i = 0; i < this.slides.length; i++) {
+      var slide = this.slides[i];
 
-    $pages.not($pages.eq(active_page_num)).css({
-      display: "none"
-    });
+      if (this.activeSlideIndex === i) {
+        slide.element.classList.add(this.params.activeClass);
+        slide.element.classList.remove(this.params.inactiveClass);
+        slide.enterAnim(slide.element);
+      } else {
+        slide.element.classList.add(this.params.inactiveClass);
+        slide.element.classList.remove(this.params.activeClass);
+        slide.exitAnim(slide.element);
+      }
+    }
+  };
 
-    // Setup buttons
-    const $buttons = $container.find(".hros-slider-goto-button");
-    $buttons.each(function(index) {
-      const $button = $buttons.eq(index);
-      const next_page_num = $button.data("goto");
+  function Slider(params) {
+    if (params == null) params = {};
+    for (var key in defaultParams) {
+      if (params[key] == null) params[key] = defaultParams[key];
+    }
 
-      $button.click(function() {
-        const active_page_num = $container.data("active-page");
+    this.params = params;
 
-        if (active_page_num === next_page_num) return;
+    var containerSelector = "." + params.classPrefix;
+    var containerClass = containerSelector;
+    var slidesClass = containerSelector + "-" + this.params.slideSufix;
+    var gotoClass = containerSelector + "-" + this.params.gotoSufix;
+    var arrowLeftClass = containerSelector + "-" + this.params.arrowLeftSufix;
+    var arrowRightClass = containerSelector + "-" + this.params.arrowRightSufix;
 
-        const num_pages = $container.data("num-pages");
+    var container = (this.container = document.querySelector(containerClass));
+    if (container == null) return;
 
-        const $curr_page = $pages.eq(active_page_num);
-        const $next_page = $pages.eq(next_page_num);
-        $container.data("active-page", next_page_num);
+    var activeSlideIndex = (this.activeSlideIndex = 0);
+    var slides = (this.slides = []);
 
-        const customSwitchFunction = $next_page.data("switch-function");
-        if (window[customSwitchFunction] != null) {
-          console.log("Custom switch:\n", customSwitchFunction);
-          window[customSwitchFunction]($curr_page, $next_page);
-        } else {
-          switchPages($curr_page, $next_page);
-        }
+    var slideElements = container.querySelectorAll(slidesClass);
+    for (var i = 0; i < slideElements.length; i++) {
+      var element = slideElements[i];
+
+      var enterAnim = element.getAttribute("data-enter");
+      if (enterAnim != null && window[enterAnim] != null) {
+        enterAnim = window[enterAnim];
+      } else {
+        enterAnim = defaultEnterAnimation;
+      }
+
+      var exitAnim = element.getAttribute("data-exit");
+      if (exitAnim != null && window[exitAnim] != null)
+        exitAnim = window[exitAnim];
+      else exitAnim = defaultExitAnimation;
+
+      slides.push({
+        element: element,
+        enterAnim: enterAnim,
+        exitAnim: exitAnim
       });
-    });
-  });
-}
+    }
 
-$(handleDocumentReady);
+    // init goto buttons
+    var gotoButtons = container.querySelectorAll(gotoClass);
+    for (var i = 0; i < gotoButtons.length; i++) {
+      var button = gotoButtons[i];
+      button.addEventListener(
+        "click",
+        function(button) {
+          var slideIndex = parseInt(button.getAttribute("data-goto"));
+          this.setActiveSlideIndex(slideIndex);
+        }.bind(this, button)
+      );
+    }
+
+    // init arrows
+    var arrowLeft = container.querySelectorAll(arrowLeftClass);
+    for (var i = 0; i < arrowLeft.length; i++) {
+      arrowLeft[i].addEventListener("click", this.handleArrowLeftClick);
+    }
+
+    var arrowRight = container.querySelectorAll(arrowRightClass);
+    for (var i = 0; i < arrowRight.length; i++) {
+      arrowRight[i].addEventListener("click", this.handleArrowRightClick);
+    }
+
+    this.updateUI();
+  }
+
+  Slider.prototype.handleArrowLeftClick = function() {
+    var newSlideIndex = Math.max(0, this.activeSlideIndex - 1);
+    this.setActiveSlideIndex(newSlideIndex);
+  };
+
+  Slider.prototype.handleArrowRightClick = function() {
+    var index = Math.min(this.slides.length - 1, this.activeSlideIndex + 1);
+    this.setActiveSlideIndex(index);
+  };
+
+  return Slider;
+}.call(this);

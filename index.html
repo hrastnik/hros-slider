@@ -9,109 +9,97 @@
         crossorigin="anonymous"></script>
     <script src="hros-slider.js"></script>
     <script>
-        function bottomUp($curr_page, $next_page) {
-            $next_page.css({ top: "100%", display: "block" });
-            $next_page.animate({ top: "0px" });
-            $curr_page.animate({ top: "-100%" }, function () {
-                $curr_page.css({ display: "none", top: '0px', left: '0px' });
-            });
-        }
-        function topDown($curr_page, $next_page) {
-            $next_page.css({ top: "-100%", display: "block" });
-            $next_page.animate({ top: "0px" });
-            $curr_page.animate({ top: "100%" }, function () {
-                $curr_page.css({ display: "none", top: '0px', left: '0px' });
-            });
-        }
-        function leftToRight($curr_page, $next_page) {
-            $next_page.css({ left: "-100%", display: "block" });
-            $next_page.animate({ left: "0px" });
-            $curr_page.animate({ left: "100%" }, function () {
-                $curr_page.css({ display: "none", top: '0px', left: '0px' });
-            });
-        }
-        function rightToLeft($curr_page, $next_page) {
-            $next_page.css({ left: "100%", display: "block" });
-            $next_page.animate({ left: "0px" });
-            $curr_page.animate({ left: "-100%" }, function () {
-                $curr_page.css({ display: "none", top: '0px', left: '0px' });
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            new hros.Slider({ classPrefix: 'hros-slider' })
+            new hros.Slider({ classPrefix: 'other-slider' })
+        })
+
+        // function exit(element) {
+        //     $(element).fadeOut();
+        //     console.log($(element));
+        // }
+
+        // function enter(element) {
+        //     $(element).fadeIn()
+        //     console.log($(element));
+        // }
     </script>
 
-    <style>
-        .container {
-            display: flex;
-            justify-content: center;
-        }
-
-        .content {
-            display: flex;
-            justify-content: center;
-            background-color: red;
-            max-width: 960px;
-            width: 960px;
-        }
-
-        .hros-slider {
-            background-color: #bbb;
-        }
-
-        .hros-slider-goto-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            background-color: peru;
-            border-radius: 20px;
-            width: 40px;
-            height: 40px;
-        }
-
-        .hros-slider-viewport {
-            background-color: greenyellow;
-            width: 500px;
-            height: 500px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .hros-slider-page {
-            position: absolute;
-            width: inherit;
-            height: inherit;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="content">
-            <div class="slider-element hros-slider">
-                <div class="hros-slider-goto-button" data-goto="0">1</div>
-                <div class="hros-slider-goto-button" data-goto="1">2</div>
-                <div class="hros-slider-goto-button" data-goto="2">3</div>
+    <h4>Usage</h4>
+    <p>Include script on your page.</p>
 
-                <div class="hros-slider-viewport">
-                    <div class="hros-slider-page" data-switch-function="bottomUp" style="background-color: green">
-                        <div>
-                            <h1>this is page 1</h1>
-                        </div>
-                    </div>
-                    <div class="hros-slider-page  hros-slider-active-page" data-switch-function="topDown"
-                        style="background-color: cyan">
-                        <div>
-                            <h1>this is page 2</h1>
-                        </div>
-                    </div>
-                    <div class="hros-slider-page" data-switch-function="leftToRight" style="background-color: yellow">
-                        <div>
-                            <h1>this is page 3</h1>
-                        </div>
-                    </div>
+    <pre>
+    &lt;script src="hros-slider.min.js"&gt;&lt;/script&gt;
+    </pre>
+
+    <p>Initialize slider when your content is loaded.</p>
+
+    <pre>
+    &lt;script&gt;
+        new hros.Slider(); 
+    &lt;/script&gt;
+    </pre>
+    <p> Wrap everything in .hros-slider. Add .hros-slider-goto to goto buttons and give
+        them 'data-goto' attribute with index of the slide they go to. Add .hros-slider-slide
+        to slides. </p>
+
+    <h4>Example:</h4>
+
+    <style>
+        .hros-slider {
+            display: flex;
+            justify-content: center;
+            margin: 20px
+        }
+
+        .viewport {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .viewport>div:nth-child(1) {
+            background-color: red;
+        }
+
+        .viewport>div:nth-child(2) {
+            background-color: green
+        }
+
+        .viewport>div:nth-child(3) {
+            background-color: blue;
+        }
+    </style>
+
+    <div class="hros-slider">
+        <div style="display: flex; flex-direction: column; justify-content: space-around; margin: 20px">
+            <div class="hros-slider-goto" data-goto="0">1</div>
+            <div class="hros-slider-goto" data-goto="1">2</div>
+            <div class="hros-slider-goto" data-goto="2">3</div>
+        </div>
+
+        <div class="viewport">
+            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+                <div>
+                    <h1>this is page 1</h1>
+                </div>
+            </div>
+            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+                <div>
+                    <h1>this is page 2</h1>
+                </div>
+            </div>
+            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+                <div>
+                    <h1>this is page 3</h1>
                 </div>
             </div>
         </div>
     </div>
+
 </body>
 
 </html>
