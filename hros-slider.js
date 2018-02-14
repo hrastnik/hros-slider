@@ -102,24 +102,25 @@ hros.Slider = function() {
     // init arrows
     var arrowLeft = container.querySelectorAll(arrowLeftClass);
     for (var i = 0; i < arrowLeft.length; i++) {
-      arrowLeft[i].addEventListener("click", this.handleArrowLeftClick);
+      arrowLeft[i].addEventListener("click", this.handleArrowLeftClick.bind(this));
     }
 
     var arrowRight = container.querySelectorAll(arrowRightClass);
     for (var i = 0; i < arrowRight.length; i++) {
-      arrowRight[i].addEventListener("click", this.handleArrowRightClick);
+      arrowRight[i].addEventListener("click", this.handleArrowRightClick.bind(this));
     }
 
     this.updateUI();
   }
 
   Slider.prototype.handleArrowLeftClick = function() {
-    var newSlideIndex = Math.max(0, this.activeSlideIndex - 1);
+    var newSlideIndex = this.activeSlideIndex - 1;
+	if (newSlideIndex < 0) newSlideIndex = this.slides.length - 1;
     this.setActiveSlideIndex(newSlideIndex);
   };
 
   Slider.prototype.handleArrowRightClick = function() {
-    var index = Math.min(this.slides.length - 1, this.activeSlideIndex + 1);
+    var index = (this.activeSlideIndex + 1) % this.slides.length;
     this.setActiveSlideIndex(index);
   };
 

@@ -11,18 +11,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             new hros.Slider({ classPrefix: 'hros-slider' })
-            new hros.Slider({ classPrefix: 'other-slider' })
         })
 
-        // function exit(element) {
-        //     $(element).fadeOut();
-        //     console.log($(element));
-        // }
+        function enter(element) {
+            $(element).fadeIn()
+            console.log('Custom enter function');
+        }
 
-        // function enter(element) {
-        //     $(element).fadeIn()
-        //     console.log($(element));
-        // }
+        function exit(element) {
+            $(element).fadeOut();
+            console.log('Custom exit function');
+        }
     </script>
 
 </head>
@@ -60,7 +59,11 @@
             height: 200px;
             overflow: hidden;
         }
-
+		
+		.hros-slider-slide {
+			position: absolute;
+		}
+		
         .viewport>div:nth-child(1) {
             background-color: red;
         }
@@ -72,6 +75,11 @@
         .viewport>div:nth-child(3) {
             background-color: blue;
         }
+		
+		.hros-slider-arrow-left, .hros-slider-arrow-right {
+			border: 1pt solid black;
+			height: 30px;
+		}
     </style>
 
     <div class="hros-slider">
@@ -80,8 +88,8 @@
             <div class="hros-slider-goto" data-goto="1">2</div>
             <div class="hros-slider-goto" data-goto="2">3</div>
         </div>
-
-        <div class="viewport">
+		
+		<div class="viewport">
             <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
                 <div>
                     <h1>this is page 1</h1>
@@ -98,6 +106,10 @@
                 </div>
             </div>
         </div>
+		
+		<div class="hros-slider-arrow-left">PREVIOUS</div>
+		<div class="hros-slider-arrow-right">NEXT</div>
+      
     </div>
 
 </body>
