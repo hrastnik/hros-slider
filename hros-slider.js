@@ -4,19 +4,15 @@ hros.Slider = function() {
     classPrefix: "hros-slider",
     activeClass: "active",
     inactiveClass: "inactive",
+    prevClass: "prev",
+    nextClass: "next",
     slideSufix: "slide",
     gotoSufix: "goto",
     arrowLeftSufix: "arrow-left",
     arrowRightSufix: "arrow-right"
   };
 
-  function defaultEnterAnimation(element) {
-    element.style.display = "initial";
-  }
-
-  function defaultExitAnimation(element) {
-    element.style.display = "none";
-  }
+  function doNothing() {}
 
   Slider.prototype.setActiveSlideIndex = function(index) {
     if (this.activeSlideIndex === index) return;
@@ -27,20 +23,56 @@ hros.Slider = function() {
   };
 
   Slider.prototype.updateUI = function() {
+    var clsPrev = this.params.prevClass;
+    var clsNext = this.params.nextClass;
+    var clsActive = this.params.activeClass;
+    var clsInactive = this.params.inactiveClass;
+
+    var possibleClasses = [clsPrev, clsNext, clsActive, clsInactive];
     for (var i = 0; i < this.slides.length; i++) {
       var slide = this.slides[i];
+      var el = slide.element;
 
-      if (this.activeSlideIndex === i) {
-        slide.element.classList.add(this.params.activeClass);
-        slide.element.classList.remove(this.params.inactiveClass);
-        slide.enterAnim(slide.element);
-      } else {
-        slide.element.classList.add(this.params.inactiveClass);
-        slide.element.classList.remove(this.params.activeClass);
-        slide.exitAnim(slide.element);
-      }
+      var classes = []; // List of classes element should end up with
+      if (i < this.activeSlideIndex) classes = [clsPrev, clsInactive];
+      else if (i === this.activeSlideIndex) classes = [clsActive];
+      else classes = [clsNext, clsInactive];
+
+      if (el.classList.contains(clsPrev) && classes.indexOf(clsActive) !== -1)
+        slide.prevToActiveAnim(el);
+      else if (
+        el.classList.contains(clsActive) &&
+        classes.indexOf(clsNext) !== -1
+      )
+        slide.activeToNextAnim(el);
+      else if (
+        el.classList.contains(clsNext) &&
+        classes.indexOf(clsActive) !== -1
+      )
+        slide.nextToActiveAnim(el);
+      else if (
+        el.classList.contains(clsActive) &&
+        classes.indexOf(clsPrev) !== -1
+      )
+        slide.activeToPrevAnim(el);
+      else if (classes.indexOf(clsActive) !== -1) slide.prevToActiveAnim(el);
+      else if (classes.indexOf(clsPrev) !== -1) slide.activeToPrevAnim(el);
+      else if (classes.indexOf(clsNext) !== -1) slide.activeToNextAnim(el);
+
+      possibleClasses.forEach(function(c) {
+        classes.indexOf(c) !== -1
+          ? el.classList.add(c)
+          : el.classList.remove(c);
+      });
     }
   };
+
+  function getFunctionFromAttrib(element, attrib) {
+    var functionName = element.getAttribute(attrib);
+    if (functionName != null && window[functionName] != null)
+      return window[functionName];
+    else return doNothing;
+  }
 
   function Slider(params) {
     if (params == null) params = {};
@@ -67,22 +99,29 @@ hros.Slider = function() {
     for (var i = 0; i < slideElements.length; i++) {
       var element = slideElements[i];
 
-      var enterAnim = element.getAttribute("data-enter");
-      if (enterAnim != null && window[enterAnim] != null) {
-        enterAnim = window[enterAnim];
-      } else {
-        enterAnim = defaultEnterAnimation;
-      }
-
-      var exitAnim = element.getAttribute("data-exit");
-      if (exitAnim != null && window[exitAnim] != null)
-        exitAnim = window[exitAnim];
-      else exitAnim = defaultExitAnimation;
+      var prevToActiveAnim = getFunctionFromAttrib(
+        element,
+        "data-prev-to-active"
+      );
+      var activeToNextAnim = getFunctionFromAttrib(
+        element,
+        "data-active-to-next"
+      );
+      var nextToActiveAnim = getFunctionFromAttrib(
+        element,
+        "data-next-to-active"
+      );
+      var activeToPrevAnim = getFunctionFromAttrib(
+        element,
+        "data-active-to-prev"
+      );
 
       slides.push({
         element: element,
-        enterAnim: enterAnim,
-        exitAnim: exitAnim
+        prevToActiveAnim: prevToActiveAnim,
+        activeToNextAnim: activeToNextAnim,
+        nextToActiveAnim: nextToActiveAnim,
+        activeToPrevAnim: activeToPrevAnim
       });
     }
 
@@ -110,6 +149,10 @@ hros.Slider = function() {
       arrowRight[i].addEventListener("click", this.handleArrowRightClick);
     }
 
+    this.slides.forEach(function(slide, i) {
+      if (i === 0) slide.element.classList.add("active");
+      else slide.element.classList.add("next");
+    });
     this.updateUI();
   }
 

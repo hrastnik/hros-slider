@@ -10,8 +10,7 @@
     <script src="hros-slider.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            new hros.Slider({ classPrefix: 'hros-slider' })
-            new hros.Slider({ classPrefix: 'other-slider' })
+            new hros.Slider()
         })
 
         // function exit(element) {
@@ -59,6 +58,12 @@
             width: 200px;
             height: 200px;
             overflow: hidden;
+            position: relative;
+        }
+
+        .hros-slider-slide {
+            position: absolute;
+            transition: all 1s;
         }
 
         .viewport>div:nth-child(1) {
@@ -74,6 +79,18 @@
         }
     </style>
 
+    <script>
+        function center(element) {
+            element.style.top = '0';
+        }
+        function goUp(element) {
+            element.style.top = '-100%';
+        }
+        function goDown(element) {
+            element.style.top = '100%';
+        }
+    </script>
+
     <div class="hros-slider">
         <div style="display: flex; flex-direction: column; justify-content: space-around; margin: 20px">
             <div class="hros-slider-goto" data-goto="0">1</div>
@@ -82,17 +99,20 @@
         </div>
 
         <div class="viewport">
-            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
+                data-next-to-active="center" data-active-to-prev="goUp">
                 <div>
                     <h1>this is page 1</h1>
                 </div>
             </div>
-            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
+                data-next-to-active="center" data-active-to-prev="goUp">
                 <div>
                     <h1>this is page 2</h1>
                 </div>
             </div>
-            <div class="hros-slider-slide" data-enter="enter" data-exit="exit">
+            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
+                data-next-to-active="center" data-active-to-prev="goUp">
                 <div>
                     <h1>this is page 3</h1>
                 </div>
