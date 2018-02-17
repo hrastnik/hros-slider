@@ -8,21 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
     <script src="hros-slider.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            new hros.Slider()
-        })
 
-        function enter(element) {
-            $(element).fadeIn()
-            console.log('Custom enter function');
-        }
-
-        function exit(element) {
-            $(element).fadeOut();
-            console.log('Custom exit function');
-        }
-    </script>
 
 </head>
 
@@ -41,96 +27,375 @@
         new hros.Slider(); 
     &lt;/script&gt;
     </pre>
-    <p> Wrap everything in .hros-slider. Add .hros-slider-goto to goto buttons and give
-        them 'data-goto' attribute with index of the slide they go to. Add .hros-slider-slide
-        to slides. </p>
+    <ul>
+        <li>
+            Wrap everything in .hros-slider.
+        </li>
+        <li>
+            Add .hros-slider-goto to goto buttons and give them 'data-goto' attribute with index
+            of the slide they go to.
+        </li>
+        <li>
+            Add .hros-slider-slide to slides.
+        </li>
+    </ul>
+    <p>
+        <pre id="my-pre" onload="console.log(this.innerHTML); this.textContent = this.innerHTML;">
+            <div class="hros-slider">
+                <div class="hros-slider-goto" data-goto="0">Go to slide 0</div>
+                <div class="hros-slider-goto" data-goto="1">Go to slide 1</div>
+                <div class="hros-slider-goto" data-goto="2">Go to slide 2</div>
 
-    <h4>Example:</h4>
+                <div class="hros-slider-arrow-left">Prev slide</div>
 
-    <style>
-        .hros-slider {
-            display: flex;
-            justify-content: center;
-            margin: 20px
-        }
-
-        .viewport {
-            width: 200px;
-            height: 200px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .hros-slider-slide {
-            position: absolute;
-            transition: all 1s;
-        }
-
-        .hros-slider-slide {
-            position: absolute;
-        }
-
-        .viewport>div:nth-child(1) {
-            background-color: red;
-        }
-
-        .viewport>div:nth-child(2) {
-            background-color: green
-        }
-
-        .viewport>div:nth-child(3) {
-            background-color: blue;
-        }
-
-        .hros-slider-arrow-left,
-        .hros-slider-arrow-right {
-            border: 1pt solid black;
-            height: 30px;
-        }
-    </style>
-
-    <script>
-        function center(element) {
-            element.style.top = '0';
-        }
-        function goUp(element) {
-            element.style.top = '-100%';
-        }
-        function goDown(element) {
-            element.style.top = '100%';
-        }
-    </script>
-
-    <div class="hros-slider">
-        <div style="display: flex; flex-direction: column; justify-content: space-around; margin: 20px">
-            <div class="hros-slider-goto" data-goto="0">1</div>
-            <div class="hros-slider-goto" data-goto="1">2</div>
-            <div class="hros-slider-goto" data-goto="2">3</div>
-        </div>
-
-        <div class="viewport">
-            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
-                data-next-to-active="center" data-active-to-prev="goUp">
-                <div>
-                    <h1>this is page 1</h1>
+                <div style="position:relative; overflow: hidden; height: 300px; width: 300px">
+                    <div class="hros-slider-slide">
+                        First slide
+                    </div>
+                    <div class="hros-slider-slide">
+                        Second slide
+                    </div>
+                    <div class="hros-slider-slide">
+                        Third slide
+                    </div>
                 </div>
+
+                <div class="hros-slider-arrow-right">Next slide</div>
             </div>
-            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
-                data-next-to-active="center" data-active-to-prev="goUp">
-                <div>
-                    <h1>this is page 2</h1>
-                </div>
+        </pre>
+        <script> var pre = document.getElementById('my-pre'); pre.textContent = pre.innerHTML; </script>
+    </p>
+
+    <h4>Examples:</h4>
+
+    <div>
+
+        <h3>Using CSS</h3>
+
+        <style>
+            .slider-css {
+                display: flex;
+                justify-content: center;
+                margin: 20px;
+            }
+
+            .slider-css .viewport {
+                width: 200px;
+                height: 200px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .slider-css-slide {
+                height: 200px;
+                width: 200px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .slider-css .viewport>div {
+                transition: all 1s;
+            }
+
+            .slider-css[data-active-slide="0"] .viewport>div {
+                transform: translateY(0)
+            }
+
+            .slider-css[data-active-slide="1"] .viewport>div {
+                transform: translateY(-200px)
+            }
+
+            .slider-css[data-active-slide="2"] .viewport>div {
+                transform: translateY(-400px);
+            }
+
+            .slider-css-slide:nth-child(1) {
+                background-color: red;
+            }
+
+            .slider-css-slide:nth-child(2) {
+                background-color: green
+            }
+
+            .slider-css-slide:nth-child(3) {
+                background-color: blue;
+            }
+
+            .slider-css-arrow-left,
+            .slider-css-arrow-right {
+                border: 1pt solid black;
+                margin: 2px;
+                height: 30px;
+            }
+
+            .slider-css-goto.active {
+                background-color: black;
+                color: white;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                new hros.Slider({ classPrefix: 'slider-css' })
+            })
+
+        </script>
+
+        <ul>
+            <li>
+                Active slide has the .active class.
+            </li>
+            <li>
+                Inactive slides have the .inactive class.
+            </li>
+            <li>
+                Slides with index less than the index of active slide have the .prev class.
+            </li>
+            <li>
+                Slides with index more than the index of active slide have the .next class.
+            </li>
+            <li>
+                Active goto button has the .active class.
+            </li>
+            <li>
+                Inactive goto buttons have the .inactive class.
+            </li>
+            <li>
+                Goto buttons with index less than the index of active slide have the .prev class.
+            </li>
+            <li>
+                Goto buttons with index more than the index of active slide have the .next class.
+            </li>
+            <li>
+                Container gets data-active attribute set to current active slide index.
+            </li>
+        </ul>
+
+        <div class="slider-css" style="display: flex; flex-direction: column; align-items: center">
+            <div style="display:flex; justify-content: space-around; align-items: center; width: 300px;">
+                <div class="slider-css-goto" data-goto="0">1</div>
+                <div class="slider-css-goto" data-goto="1">2</div>
+                <div class="slider-css-goto" data-goto="2">3</div>
             </div>
-            <div class="hros-slider-slide" data-prev-to-active="center" data-active-to-next="goDown"
-                data-next-to-active="center" data-active-to-prev="goUp">
-                <div>
-                    <h1>this is page 3</h1>
+
+            <div style="display:flex; justify-content: center; align-items: center; overflow: hidden;">
+                <div class="slider-css-arrow-left">PREV</div>
+
+                <div class="viewport">
+                    <div>
+                        <div class="slider-css-slide">
+                            <div>
+                                <h1>this is page 1</h1>
+                            </div>
+                        </div>
+                        <div class="slider-css-slide">
+                            <div>
+                                <h1>this is page 2</h1>
+                            </div>
+                        </div>
+                        <div class="slider-css-slide">
+                            <div>
+                                <h1>this is page 3</h1>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="slider-css-arrow-right">NEXT</div>
             </div>
         </div>
 
     </div>
 
+    <div>
+
+        <h3>Using JavaScript</h3>
+
+        <style>
+            .slider-js {
+                display: flex;
+                justify-content: center;
+                margin: 20px;
+            }
+
+            .slider-js .viewport {
+                width: 200px;
+                height: 200px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .slider-js-slide {
+                width: 200px;
+                height: 200px;
+                overflow: hidden;
+                position: absolute;
+            }
+
+            .slider-js-slide:nth-child(1) {
+                background-color: red;
+            }
+
+            .slider-js-slide:nth-child(2) {
+                background-color: green
+            }
+
+            .slider-js-slide:nth-child(3) {
+                background-color: blue;
+            }
+
+            .slider-js-arrow-left,
+            .slider-js-arrow-right {
+                border: 1pt solid black;
+                margin: 2px;
+                height: 30px;
+            }
+
+            .slider-js-goto.active {
+                background-color: black;
+                color: white;
+            }
+        </style>
+        <script>
+            function topToCenter(element) {
+                var $el = $(element);
+                $el.animate({ top: 0 }, {
+                    duration: 500,
+                    easing: 'swing',
+                    start: function () {
+                        $el.css({ top: '-100%', zIndex: 10 });
+                    }
+                });
+            }
+            function bottomToCenter(element) {
+                var $el = $(element);
+                $el.animate({ top: 0 }, {
+                    duration: 500,
+                    easing: 'swing',
+                    start: function () {
+                        $el.css({ top: '100%', zIndex: 10 });
+                    }
+                });
+            }
+            function goDown(element) {
+                var $el = $(element);
+                $el.animate({ top: '100%' }, {
+                    duration: 500,
+                    easing: 'swing',
+                    start: function () {
+                        $el.css({ top: 0 });
+                    },
+                    complete: function () {
+                        $el.css({ zIndex: 0 });
+                    }
+                });
+            }
+            function goUp(element) {
+                var $el = $(element);
+                $el.animate({ top: '-100%' }, {
+                    duration: 500,
+                    easing: 'swing',
+                    start: function () {
+                        $el.css({ top: 0 });
+                    },
+                    complete: function () {
+                        $el.css({ zIndex: 0 });
+                    }
+                });
+            }
+
+            function topToBottom(element) { var $el = $(element); $el.css({ top: '100%' }) }
+            function bottomToTop(element) { var $el = $(element); $el.css({ top: '-100%' }) }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                new hros.Slider({ classPrefix: 'slider-js' })
+            })
+        </script>
+
+        <ul>
+            <li>
+                Slide element can have the following attributes: data-prev-to-active, data-active-to-next,
+                data-next-to-active data-active-to-prev, data-prev-to-next, data-next-to-prev.
+                <br> The attributes can contain the name of the function that is called
+                when the slide transitions between states.
+            </li>
+            <li>
+                For example:
+                <pre>
+        &lt;script&gt;
+          function hide(el) { el.style.display = 'none'; }
+          function show(el) { el.style.display = 'block'; }
+        &lt;/script&gt;
+
+        &lt;div class="slider-js-slide" 
+          data-prev-to-active="show" 
+          data-next-to-active="show" 
+          data-active-to-next="hide"
+          data-active-to-prev="hide"&gt;
+            ...
+        &lt;/div&gt;
+                </pre>
+            </li>
+
+        </ul>
+
+        <div class="slider-js" style="display: flex; flex-direction: column; align-items: center">
+            <div style="display:flex; justify-content: space-around; align-items: center; width: 300px;">
+                <div class="slider-js-goto" data-goto="0">1</div>
+                <div class="slider-js-goto" data-goto="1">2</div>
+                <div class="slider-js-goto" data-goto="2">3</div>
+            </div>
+
+            <div style="display:flex; justify-content: center; align-items: center; overflow: hidden;">
+                <div class="slider-js-arrow-left">PREV</div>
+
+                <div class="viewport">
+                    <div class="slider-js-slide" data-prev-to-active="topToCenter" data-active-to-next="goDown"
+                        data-next-to-active="bottomToCenter" data-active-to-prev="goUp"
+                        data-prev-to-next="topToBottom" data-next-to-prev="bottomToTop">
+                        <div>
+                            <h1>this is page 1</h1>
+                        </div>
+                    </div>
+                    <div class="slider-js-slide" data-prev-to-active="topToCenter" data-active-to-next="goDown"
+                        data-next-to-active="bottomToCenter" data-active-to-prev="goUp"
+                        data-prev-to-next="topToBottom" data-next-to-prev="bottomToTop">
+                        <div>
+                            <h1>this is page 2</h1>
+                        </div>
+                    </div>
+                    <div class="slider-js-slide" data-prev-to-active="topToCenter" data-active-to-next="goDown"
+                        data-next-to-active="bottomToCenter" data-active-to-prev="goUp"
+                        data-prev-to-next="topToBottom" data-next-to-prev="bottomToTop">
+                        <div>
+                            <h1>this is page 3</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slider-js-arrow-right">NEXT</div>
+            </div>
+        </div>
+
+    </div>
+
+    <h4>Options and defaults:</h4>
+    <p>
+        <pre>
+            var slider = new hros.Slider({
+                classPrefix: "hros-slider",      // Class prefix all classes recieve
+                activeClass: "active",           // Classname the active slide recieves 
+                inactiveClass: "inactive",       // Classname all inactive slides recieve
+                prevClass: "prev",               // Classname all slides with index &lt; activeIndex recieve
+                nextClass: "next",               // Classname all slides with index &gt; activeIndex recieve
+                slideSufix: "slide",             // Slides receive the classname: classPrefix + '-' + slideSufix 
+                gotoSufix: "goto",               // Goto buttons receive the classname: classPrefix + '-' + gotoSufix
+                arrowLeftSufix: "arrow-left",    // Left arrows receive the classname: classPrefix + '-' + arrowLeftSufix
+                arrowRightSufix: "arrow-right"   // Right buttons receive the classname: classPrefix + '-' + arrowRightSufix
+            });
+        </pre>
+
+    </p>
 </body>
 
 </html>

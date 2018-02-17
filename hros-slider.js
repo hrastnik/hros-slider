@@ -28,6 +28,11 @@ hros.Slider = function() {
     var clsActive = this.params.activeClass;
     var clsInactive = this.params.inactiveClass;
 
+    this.container.setAttribute(
+      "data-active-slide",
+      this.activeSlideIndex.toString()
+    );
+
     var possibleClasses = [clsPrev, clsNext, clsActive, clsInactive];
     for (var i = 0; i < this.slides.length; i++) {
       var slide = this.slides[i];
@@ -55,14 +60,35 @@ hros.Slider = function() {
         classes.indexOf(clsPrev) !== -1
       )
         slide.activeToPrevAnim(el);
+      else if (
+        el.classList.contains(clsPrev) &&
+        classes.indexOf(clsNext) !== -1
+      )
+        slide.prevToNextAnim(el);
+      else if (
+        el.classList.contains(clsNext) &&
+        classes.indexOf(clsPrev) !== -1
+      )
+        slide.nextToPrevAnim(el);
       else if (classes.indexOf(clsActive) !== -1) slide.prevToActiveAnim(el);
       else if (classes.indexOf(clsPrev) !== -1) slide.activeToPrevAnim(el);
       else if (classes.indexOf(clsNext) !== -1) slide.activeToNextAnim(el);
 
+      var currSlideGotoButtons = this.container.querySelectorAll(
+        this.gotoClass + "[data-goto='" + i + "']"
+      );
       possibleClasses.forEach(function(c) {
-        classes.indexOf(c) !== -1
-          ? el.classList.add(c)
-          : el.classList.remove(c);
+        if (classes.indexOf(c) !== -1) {
+          el.classList.add(c);
+          for (var j = 0; j < currSlideGotoButtons.length; j++) {
+            currSlideGotoButtons[j].classList.add(c);
+          }
+        } else {
+          el.classList.remove(c);
+          for (var j = 0; j < currSlideGotoButtons.length; j++) {
+            currSlideGotoButtons[j].classList.remove(c);
+          }
+        }
       });
     }
   };
@@ -82,20 +108,24 @@ hros.Slider = function() {
 
     this.params = params;
 
-    var containerSelector = "." + params.classPrefix;
-    var containerClass = containerSelector;
-    var slidesClass = containerSelector + "-" + this.params.slideSufix;
-    var gotoClass = containerSelector + "-" + this.params.gotoSufix;
-    var arrowLeftClass = containerSelector + "-" + this.params.arrowLeftSufix;
-    var arrowRightClass = containerSelector + "-" + this.params.arrowRightSufix;
+    this.containerSelector = "." + params.classPrefix;
+    this.containerClass = this.containerSelector;
+    this.slidesClass = this.containerSelector + "-" + this.params.slideSufix;
+    this.gotoClass = this.containerSelector + "-" + this.params.gotoSufix;
+    this.arrowLeftClass =
+      this.containerSelector + "-" + this.params.arrowLeftSufix;
+    this.arrowRightClass =
+      this.containerSelector + "-" + this.params.arrowRightSufix;
 
-    var container = (this.container = document.querySelector(containerClass));
+    var container = (this.container = document.querySelector(
+      this.containerClass
+    ));
     if (container == null) return;
 
     var activeSlideIndex = (this.activeSlideIndex = 0);
     var slides = (this.slides = []);
 
-    var slideElements = container.querySelectorAll(slidesClass);
+    var slideElements = container.querySelectorAll(this.slidesClass);
     for (var i = 0; i < slideElements.length; i++) {
       var element = slideElements[i];
 
@@ -116,17 +146,22 @@ hros.Slider = function() {
         "data-active-to-prev"
       );
 
+      var prevToNextAnim = getFunctionFromAttrib(element, "data-prev-to-next");
+      var nextToPrevAnim = getFunctionFromAttrib(element, "data-next-to-prev");
+
       slides.push({
         element: element,
         prevToActiveAnim: prevToActiveAnim,
         activeToNextAnim: activeToNextAnim,
         nextToActiveAnim: nextToActiveAnim,
-        activeToPrevAnim: activeToPrevAnim
+        activeToPrevAnim: activeToPrevAnim,
+        prevToNextAnim: prevToNextAnim,
+        nextToPrevAnim: nextToPrevAnim
       });
     }
 
     // init goto buttons
-    var gotoButtons = container.querySelectorAll(gotoClass);
+    var gotoButtons = container.querySelectorAll(this.gotoClass);
     for (var i = 0; i < gotoButtons.length; i++) {
       var button = gotoButtons[i];
       button.addEventListener(
@@ -139,14 +174,20 @@ hros.Slider = function() {
     }
 
     // init arrows
-    var arrowLeft = container.querySelectorAll(arrowLeftClass);
+    var arrowLeft = container.querySelectorAll(this.arrowLeftClass);
     for (var i = 0; i < arrowLeft.length; i++) {
-      arrowLeft[i].addEventListener("click", this.handleArrowLeftClick.bind(this));
+      arrowLeft[i].addEventListener(
+        "click",
+        this.handleArrowLeftClick.bind(this)
+      );
     }
 
-    var arrowRight = container.querySelectorAll(arrowRightClass);
+    var arrowRight = container.querySelectorAll(this.arrowRightClass);
     for (var i = 0; i < arrowRight.length; i++) {
-      arrowRight[i].addEventListener("click", this.handleArrowRightClick.bind(this));
+      arrowRight[i].addEventListener(
+        "click",
+        this.handleArrowRightClick.bind(this)
+      );
     }
 
     this.slides.forEach(function(slide, i) {
@@ -157,13 +198,12 @@ hros.Slider = function() {
   }
 
   Slider.prototype.handleArrowLeftClick = function() {
-    var newSlideIndex = this.activeSlideIndex - 1;
-	if (newSlideIndex < 0) newSlideIndex = this.slides.length - 1;
+    var newSlideIndex = Math.max(0, this.activeSlideIndex - 1);
     this.setActiveSlideIndex(newSlideIndex);
   };
 
   Slider.prototype.handleArrowRightClick = function() {
-    var index = (this.activeSlideIndex + 1) % this.slides.length;
+    var index = Math.min(this.slides.length - 1, this.activeSlideIndex + 1);
     this.setActiveSlideIndex(index);
   };
 
