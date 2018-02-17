@@ -1,4 +1,4 @@
 JavaScript slider / page switcher
 
 Usage:
-Checkout `index.html` for example
+Checkout [DEMO](https://hrastnik.github.io/InViewport/) for example
